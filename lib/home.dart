@@ -91,13 +91,6 @@ class _HomeState extends State<Home> {
             Expanded(child: ListView.builder(
               itemBuilder: (context, index){
 
-                /*
-                return ListTile(
-                  title: Text(_listaTarefas[index]['titulo']),
-
-                );
-                */
-
                 return CheckboxListTile(value: _listaTarefas[index]["realizada"],
                     activeColor: Colors.purpleAccent,
                     title: Text(_listaTarefas[index]["titulo"]),
