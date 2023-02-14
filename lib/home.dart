@@ -17,6 +17,7 @@ class _HomeState extends State<Home> {
 
   TextEditingController _tarefaUsuario = TextEditingController();
   List _listaTarefas = [];
+  Map<String, dynamic> _ultimoRemovido = Map();
 
   Future<File> _getFile() async {
 
@@ -67,12 +68,33 @@ class _HomeState extends State<Home> {
 
   Widget criarItemLista(contex, index){
 
-    final item = _listaTarefas[index]['titulo'];
+    final item = DateTime.now().microsecondsSinceEpoch.toString();
 
     return Dismissible(key: Key(item),
         onDismissed: (direction){
+
+          //recuperar último item exluído
+          _ultimoRemovido = _listaTarefas[index];
+
+          //remove item da lista
           _listaTarefas.removeAt(index);
           _salvarArquivo();
+          
+          //snackbar
+          final snackbar = SnackBar(
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+              action: SnackBarAction(label: 'Desfazer', textColor: Colors.white,onPressed: (){
+
+                setState(() {
+                  _listaTarefas.insert(index, _ultimoRemovido);
+                });
+                _salvarArquivo();
+
+              },),
+              content: Text('Tarefa removida!')
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackbar);
         },
         direction: DismissDirection.endToStart,
         background: Container(
@@ -109,7 +131,8 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    //print("itens: "+_listaTarefas.toString());
+    //print(_listaTarefas.toString());
+    //print("itens: "+ DateTime.now().microsecondsSinceEpoch.toString());
     return Scaffold(
       backgroundColor: Colors.white ,
       appBar: AppBar(
