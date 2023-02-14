@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'package:app_listadetarefas/dismissible.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -64,6 +65,39 @@ class _HomeState extends State<Home> {
 
   }
 
+  Widget criarItemLista(contex, index){
+
+    final item = _listaTarefas[index]['titulo'];
+
+    return Dismissible(key: Key(item),
+        onDismissed: (direction){
+          _listaTarefas.removeAt(index);
+          _salvarArquivo();
+        },
+        direction: DismissDirection.endToStart,
+        background: Container(
+          padding: EdgeInsets.all(16),
+          color: Colors.red,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Icon(Icons.delete, color: Colors.white,)
+            ],
+          ),
+        ),
+
+        child: CheckboxListTile(value: _listaTarefas[index]["realizada"],
+            activeColor: Colors.purpleAccent,
+            title: Text(_listaTarefas[index]["titulo"]),
+            onChanged: (bool? valor){
+              setState(() {
+                _listaTarefas[index]["realizada"] = valor!;
+              });
+              _salvarArquivo();
+            })
+    );
+  }
+
   @override
   void initState() {
     _lerArquivo().then((dados){
@@ -89,18 +123,7 @@ class _HomeState extends State<Home> {
         child: Column(
           children: <Widget>[
             Expanded(child: ListView.builder(
-              itemBuilder: (context, index){
-
-                return CheckboxListTile(value: _listaTarefas[index]["realizada"],
-                    activeColor: Colors.purpleAccent,
-                    title: Text(_listaTarefas[index]["titulo"]),
-                    onChanged: (bool? valor){
-                      setState(() {
-                        _listaTarefas[index]["realizada"] = valor!;
-                      });
-                      _salvarArquivo();
-                    });
-              },
+              itemBuilder: criarItemLista,
               itemCount: _listaTarefas.length,
             )),
           ],
